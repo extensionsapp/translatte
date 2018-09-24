@@ -1,0 +1,37 @@
+{
+  "name": "translatte",
+  "version": "1.0.0",
+  "description": "A free and unlimited translate for NodeJS",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/extensionsapp/translatte.git"
+  },
+  "keywords": [
+    "translate",
+    "translator",
+    "google",
+    "translate",
+    "api",
+    "free",
+    "language",
+    "proxy",
+    "translatte"
+  ],
+  "author": {
+    "name": "ExtensionsApp",
+    "email": "extensionsapp@gmail.com"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/extensionsapp/translatte/issues"
+  },
+  "homepage": "https://github.com/extensionsapp/translatte#readme",
+  "dependencies": {
+    "configstore": "4.0.0",
+    "google-translate-token": "1.0.0",
+    "got": "9.2.2",
+    "safe-eval": "0.4.1",
+    "tunnel-agent": "0.6.0"
+  }
+}
