@@ -1,6 +1,5 @@
 var querystring = require('querystring');
 var got         = require('got');
-var safeEval    = require('safe-eval');
 var tunnel      = require('tunnel-agent');
 var token       = require('google-translate-token');
 
@@ -62,8 +61,8 @@ function translate(text, opts) {
     }
 
     var agent = (proxy.host || proxy.headers)
-        ? {agent: tunnel.httpsOverHttp({proxy: proxy})}
-        : {};
+        ? {agent: tunnel.httpsOverHttp({proxy: proxy}), json: true}
+        : {json: true};
 
     return token.get(text).then(function (token) {
         var url = 'https://translate.google.com/translate_a/single';
@@ -103,10 +102,11 @@ function translate(text, opts) {
             };
 
             if (opts.raw) {
-                result.raw = res.body;
+                result.raw = JSON.stringify(res.body);
             }
 
-            var body = safeEval(res.body);
+            var body = res.body;
+
             body[0].forEach(function (obj) {
                 if (obj[0]) {
                     result.text += obj[0];
@@ -137,7 +137,6 @@ function translate(text, opts) {
 
             return result;
         }).catch(function (err) {
-            console.log(err);
             var e;
             e = new Error();
             if (err.statusCode !== undefined && err.statusCode !== 200) {
