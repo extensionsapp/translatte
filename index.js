@@ -61,8 +61,6 @@ function translate(text, opts) {
         }
     }
 
-    console.log(proxy);
-
     var agent = (proxy.host || proxy.headers)
         ? {agent: tunnel.httpsOverHttp({proxy: proxy})}
         : {};

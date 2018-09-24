@@ -12,6 +12,14 @@ npm i translatte
 ```javascript
 const translatte = require('translatte');
 
+// Translate string to Russian
+translatte('Do you speak Russian?', {to: 'ru'}).then(res => {
+    console.log(res.text);
+}).catch(err => {
+    console.error(err);
+});
+// а ты говоришь по русски?
+
 // Translate string to English using proxy
 translatte('Вы говорите на русском?', {
     from: 'ru',
