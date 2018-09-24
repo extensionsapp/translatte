@@ -9,19 +9,25 @@ npm i translatte
 
 ### Usage
 
+Translate string to German:
+
 ```javascript
 const translatte = require('translatte');
 
-// Translate string to Russian
-translatte('Do you speak Russian?', {to: 'ru'}).then(res => {
+translatte('Do you speak Russian?', {to: 'de'}).then(res => {
     console.log(res.text);
 }).catch(err => {
     console.error(err);
 });
-// а ты говоришь по русски?
+// Ihr sprecht auf Russisch?
+```
 
-// Translate string to English using proxy
-translatte('Вы говорите на русском?', {
+Translate string to English using proxy:
+
+```javascript
+const translatte = require('translatte');
+
+translatte('Вы говорите по-русски?', {
     from: 'ru',
     to: 'en',
     agents: [
