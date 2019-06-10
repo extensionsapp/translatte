@@ -103,6 +103,36 @@ Type: `array` Default: `[]`
 
 An `array` of strings `LOGIN:PASSWORD@IP:PORT` specifying the proxies `['LOGIN:PASSWORD@192.0.2.100:12345', 'LOGIN:PASSWORD@192.0.2.200:54321']`. One random result will be selected.
 
+##### tld
+
+Type: `string` Default: `com`
+
+TLD for Google translate host to be used in API calls: `https://translate.google.[tld]`
+
+##### client
+
+Type: `string` Default: `t`
+
+Query parameter client used in API calls. Can be `t|gtx|webapp`.
+
+#### services
+
+Type: `object` Default: `{"google_free": true}`
+
+Objects in order of priority, if one of the services does not perform the translation, it proceeds to the next.
+
+**Supported services:**
+- `{"google_free": true}`
+  - <a href="https://translate.google.com/" target="_blank">Google Translate</a>, this service works by default. It is completely free and has no limits.
+- `{"google_v3": {"project-id": "XXX", "token": "YYY"}}`
+  - <a href="https://cloud.google.com/translate/docs/quickstart-client-libraries-v3" target="_blank">Google Cloud</a>, requires registration and credit card details. 500,000 characters per month are issued free of charge, then $20 for every million characters.
+- `{"microsoft_v3": {"key": "XXX"}}`
+  - <a href="https://azure.microsoft.com/en-us/pricing/details/cognitive-services/translator-text-api/" target="_blank">Microsoft Azure</a>, requires registration and credit card details. Free of charge 2,000,000 characters per month, then $10 for every million characters.
+- `{"yandex_v1": {"key": "XXX"}}`
+  - <a href="https://translate.yandex.ru/developers/keys" target="_blank">Yandex Translate</a>, requires registration. Free of charge 10,000,000 characters per month.
+- `{"yandex_v2": {"token": "XXX"}}`
+  - <a href="https://cloud.yandex.ru/docs/translate/" target="_blank">Yandex Cloud</a>, requires registration and credit card details. $15 for every million characters.
+
 ### Returns an `object`:
 
 - `text` *(string)* – The translated text.
@@ -113,7 +143,7 @@ An `array` of strings `LOGIN:PASSWORD@IP:PORT` specifying the proxies `['LOGIN:P
   - `text` *(object)*
     - `autoCorrected` *(boolean)* – `true` if the API has auto corrected the `text`
     - `value` *(string)* – The auto corrected `text` or the `text` with suggested corrections
-    - `didYouMean` *(booelan)* – `true` if the API has suggested corrections to the `text`
+    - `didYouMean` *(boolean)* – `true` if the API has suggested corrections to the `text`
 - `raw` *(string)* - If `options.raw` is true, the raw response from Google Translate servers. Otherwise, `''`.
 
 Note that `res.from.text` will only be returned if `from.text.autoCorrected` or `from.text.didYouMean` equals to `true`. In this case, it will have the corrections delimited with brackets (`[ ]`):
@@ -128,6 +158,4 @@ translate('I spea Dutch').then(res => {
 ```
 Otherwise, it will be an empty `string` (`''`).
 
-###### Original package: https://github.com/matheuss/google-translate-api
-
-© 2018 ExtensionsApp
+2019 ExtensionsApp
