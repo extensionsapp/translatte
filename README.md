@@ -130,7 +130,7 @@ Objects in order of priority, if one of the services does not perform the transl
   - <a href="https://azure.microsoft.com/en-us/pricing/details/cognitive-services/translator-text-api/" target="_blank">Microsoft Azure</a>, requires registration and credit card details. Free of charge 2,000,000 characters per month, then $10 for every million characters.
 - `{"yandex_v1": {"key": "XXX"}}`
   - <a href="https://translate.yandex.ru/developers/keys" target="_blank">Yandex Translate</a>, requires registration. Free of charge 10,000,000 characters per month.
-- `{"yandex_v2": {"token": "XXX"}}`
+- `{"yandex_v2": {"key": "XXX"}}`
   - <a href="https://cloud.yandex.ru/docs/translate/" target="_blank">Yandex Cloud</a>, requires registration and credit card details. $15 for every million characters.
 
 ### Returns an `object`:

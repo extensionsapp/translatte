@@ -175,7 +175,7 @@ const translatte = async (text, opts) => {
             const {body} = await got(url, {
                 method: 'POST',
                 headers: {
-                    'Authorization': 'Bearer ' + opts.services['yandex_v2']['token'],
+                    'Authorization': 'Api-Key ' + opts.services['yandex_v2']['key'],
                     'Content-type': 'application/json'
                 },
                 body: {
