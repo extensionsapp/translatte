@@ -113,7 +113,7 @@ TLD for Google translate host to be used in API calls: `https://translate.google
 
 Type: `string` Default: `t`
 
-Query parameter client used in API calls. Can be `t|gtx|webapp`.
+Query parameter client used in API calls. Can be `t|gtx`.
 
 #### services
 

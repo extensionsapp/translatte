@@ -74,14 +74,14 @@ var window = {
 };
 
 function updateTKK(opts) {
-    opts = opts || {tld: 'com', proxy: {}};
+    opts = opts || {tld: 'com', proxy: {}, headers: {}};
     return new Promise(function (resolve, reject) {
         var now = Math.floor(Date.now() / 3600000);
 
         if (Number(window.TKK.split('.')[0]) === now) {
             resolve();
         } else {
-            got('https://translate.google.' + opts.tld, opts.proxy).then(function (res) {
+            got('https://translate.google.' + opts.tld, {...opts.proxy, headers: opts.headers}).then(function (res) {
                 var code = res.body.match(/TKK='.*?';/g);
 
                 if (code) {
@@ -100,11 +100,8 @@ function updateTKK(opts) {
                  */
 
                 resolve();
-            }).catch(function (err) {
-                var e = new Error();
-                e.code = 'BAD_NETWORK';
-                e.message = err.message;
-                reject(e);
+            }).catch(function () {
+                reject();
             });
         }
     });

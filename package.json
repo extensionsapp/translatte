@@ -1,6 +1,6 @@
 {
   "name": "translatte",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "A free and unlimited translate for NodeJS",
   "main": "index.js",
   "repository": {
@@ -39,7 +39,7 @@
   },
   "homepage": "https://github.com/extensionsapp/translatte#readme",
   "dependencies": {
-    "tunnel-agent": "0.6.0",
+    "tunnel": "0.0.6",
     "configstore": "4.0.0",
     "got": "9.6.0"
   }

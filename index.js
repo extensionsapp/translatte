@@ -1,6 +1,6 @@
 const querystring = require('querystring');
 const languages = require('./languages');
-const tunnel = require('tunnel-agent');
+const tunnel = require('tunnel');
 const token = require('./token');
 const got = require('got');
 
@@ -212,7 +212,7 @@ const translatte = async (text, opts) => {
 
     if (opts.agents.length) {
         let a = opts.agents[Math.floor(Math.random() * opts.agents.length)];
-        proxy.headers = {
+        opts.headers = {
             'User-Agent': a
         };
     }
@@ -228,8 +228,10 @@ const translatte = async (text, opts) => {
         }
     }
 
-    opts.proxy = (proxy.host || proxy.headers)
-        ? {agent: tunnel.httpsOverHttp({proxy})}
+    opts.proxy = proxy.host
+        ? opts.headers
+            ? {agent: tunnel.httpsOverHttp({proxy, headers: opts.headers})}
+            : {agent: tunnel.httpsOverHttp({proxy})}
         : {};
 
     let t = await token.get(text, opts);
@@ -254,7 +256,7 @@ const translatte = async (text, opts) => {
         });
 
     try {
-        translate = await got(url, {...opts.proxy, json: true});
+        translate = await got(url, {...opts.proxy, json: true, headers: opts.headers});
     } catch (e) {
         return Promise.reject(errors[4]);
     }
