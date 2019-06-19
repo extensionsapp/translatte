@@ -6,6 +6,7 @@ const got = require('got');
 
 const translatte = async (text, opts) => {
     opts = opts || {};
+    opts = JSON.parse(JSON.stringify(opts));
 
     let result = {
         text: '',
@@ -44,9 +45,13 @@ const translatte = async (text, opts) => {
     opts.from = languages.getCode(opts.from || 'auto');
     opts.to = languages.getCode(opts.to || 'en');
 
-    opts.priority = opts.services
-        ? Object.keys(opts.services) // google_free, google_v3, microsoft_v3, yandex_v1, yandex_v2
-        : ['google_free'];
+    opts.priority = opts.priority
+        ? typeof opts.priority === 'string'
+            ? [opts.priority]
+            : opts.priority
+        : opts.services
+            ? Object.keys(opts.services)
+            : ['google_free'];
 
     if (opts.priority.length > 1) {
         return opts.priority.reduce((p, priority) => {
