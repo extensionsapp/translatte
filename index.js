@@ -106,7 +106,8 @@ const translatte = async (text, opts) => {
                     target_language_code: opts.to,
                     contents: [text]
                 },
-                json: true
+                json: true,
+                timeout: 10000
             });
             for (const translation of body.translations) {
                 result.text += result.text
@@ -139,7 +140,8 @@ const translatte = async (text, opts) => {
                 body: {
                     text: [text]
                 },
-                json: true
+                json: true,
+                timeout: 10000
             });
             for (const translation of body) {
                 result.text += result.text
@@ -163,7 +165,7 @@ const translatte = async (text, opts) => {
                 text: text
             });
         try {
-            const {body} = await got(url, {json: true});
+            const {body} = await got(url, {json: true, timeout: 10000});
             for (const translation of body.text) {
                 result.text += result.text
                     ? ' ' + translation
@@ -190,7 +192,8 @@ const translatte = async (text, opts) => {
                     targetLanguageCode: opts.to,
                     texts: [text]
                 },
-                json: true
+                json: true,
+                timeout: 10000
             });
             for (const translation of body.translations) {
                 result.text += result.text
@@ -265,7 +268,7 @@ const translatte = async (text, opts) => {
         });
 
     try {
-        translate = await got(url, {...opts.proxy, json: true, headers: opts.headers});
+        translate = await got(url, {...opts.proxy, json: true, timeout: 10000, headers: opts.headers});
     } catch (e) {
         return Promise.reject(errors[4]);
     }
