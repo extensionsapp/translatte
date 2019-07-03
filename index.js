@@ -21,7 +21,9 @@ const translatte = async (text, opts) => {
                 value: '',
                 didYouMean: false
             }
-        }
+        },
+        proxy: '',
+        agent: ''
     };
 
     let errors = [
@@ -217,12 +219,14 @@ const translatte = async (text, opts) => {
 
     if (opts.agents.length) {
         let a = opts.agents[Math.floor(Math.random() * opts.agents.length)];
+        result.agent = a;
         opts.headers = {
             'User-Agent': a
         };
     }
     if (opts.proxies.length) {
         let p = opts.proxies[Math.floor(Math.random() * opts.proxies.length)];
+        result.proxy = p;
         if (p.indexOf('@') + 1) {
             proxy.proxyAuth = p.split('@')[0];
             proxy.host = (p.split('@')[1]).split(':')[0];
