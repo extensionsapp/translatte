@@ -160,4 +160,6 @@ translate('I spea Dutch').then(res => {
 ```
 Otherwise, it will be an empty `string` (`''`).
 
+If you use a proxy and there is a ETIMEDOUT error, then in error you will see the proxy used.
+
 2019 ExtensionsApp

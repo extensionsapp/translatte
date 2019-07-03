@@ -270,6 +270,9 @@ const translatte = async (text, opts) => {
     try {
         translate = await got(url, {...opts.proxy, json: true, timeout: 10000, headers: opts.headers});
     } catch (e) {
+        if (e && e.code && e.code === 'ETIMEDOUT' && result.proxy) {
+            return Promise.reject(result.proxy);
+        }
         return Promise.reject(errors[4]);
     }
 
