@@ -28,7 +28,7 @@ const translatte = async (text, opts) => {
 
     let errors = [
         'The language «[lang]» is not supported',
-        'Text must not exceed 2900 characters',
+        'Text must not exceed 5000 bytes',
         'The server returned an empty response',
         'Could not get token from google',
         'Text translation request failed'
@@ -42,6 +42,7 @@ const translatte = async (text, opts) => {
         return Promise.reject(errors[0].replace('[lang]', opts.to));
     }
 
+    let bytes = languages.utf8Length(text);
     opts.client = opts.client || 't';
     opts.tld = opts.tld || 'com';
     opts.from = languages.getCode(opts.from || 'auto');
@@ -69,10 +70,13 @@ const translatte = async (text, opts) => {
         }, Promise.resolve());
     }
 
-    if (text.length > 2900) {
+    if (bytes > 5000) {
+        let chars = Math.ceil(text.length / Math.ceil(bytes / 4700)) + 100;
         let texts = [];
         ['\\.\\s', ',\\s', '\\s'].forEach(t => {
-            texts = text.match(new RegExp('[^]{1,2900}(' + t + '|$)', 'ig'))
+            if (!texts || !texts.length) {
+                texts = text.match(new RegExp('[^]{1,' + chars + '}(' + t + '|$)', 'ig'));
+            }
         });
         if (!texts) return Promise.reject(errors[1]);
         return texts.reduce((p, item) => {
