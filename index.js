@@ -129,7 +129,7 @@ const translatte = async (text, opts) => {
         let url = 'https://api.cognitive.microsofttranslator.com/translate?' +
             querystring.stringify({
                 'api-version': '3.0',
-                from: opts.from,
+                from: opts.from === 'auto' ? '' : opts.from,
                 to: opts.to
             });
         try {
@@ -137,17 +137,16 @@ const translatte = async (text, opts) => {
                 method: 'POST',
                 headers: {
                     'Ocp-Apim-Subscription-Key': opts.services['microsoft_v3']['key'],
-                    'Content-type': 'application/json',
-                    'X-ClientTraceId': ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
-                        (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16))
+                    'Content-type': 'application/json'
                 },
-                body: {
-                    text: [text]
-                },
+                body: [{text}],
                 json: true,
                 timeout: 10000
             });
             for (const translation of body) {
+                if (translation.detectedLanguage && translation.detectedLanguage.language) {
+                    result.from.language.iso = translation.detectedLanguage.language;
+                }
                 result.text += result.text
                     ? ' ' + translation.translations[0].text
                     : translation.translations[0].text;
