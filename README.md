@@ -147,6 +147,7 @@ Objects in order of priority, if one of the services does not perform the transl
 - `raw` *(string)* - If `options.raw` is true, the raw response from Google Translate servers. Otherwise, `''`.
 - `proxy` *(string)* – The proxy that were used in the request.
 - `agent` *(string)* – The agent that were used in the request.
+- `service` *(object)* – The service that were used in the request.
 
 Note that `res.from.text` will only be returned if `from.text.autoCorrected` or `from.text.didYouMean` equals to `true`. In this case, it will have the corrections delimited with brackets (`[ ]`):
 

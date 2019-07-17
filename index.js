@@ -23,7 +23,8 @@ const translatte = async (text, opts) => {
             }
         },
         proxy: '',
-        agent: ''
+        agent: '',
+        service: {google_free: true}
     };
 
     let errors = [
@@ -95,7 +96,13 @@ const translatte = async (text, opts) => {
     }
 
     if (opts.priority.indexOf('google_v3') + 1) {
-        if (!opts['google_v3']) return Promise.resolve(result);
+        if (!opts.services['google_v3']) return Promise.resolve(result);
+        if (Array.isArray(opts.services['google_v3'])) {
+            opts.services['google_v3'] = opts
+                .services['google_v3'][Math.floor(Math.random() * opts
+                .services['google_v3'].length)];
+        }
+        result.service = {google_v3: opts.services['google_v3']};
         let url = 'https://translation.googleapis.com/v3beta1/projects/' +
             opts.services['google_v3']['project-id'] + '/locations/global:translateText';
         try {
@@ -119,13 +126,19 @@ const translatte = async (text, opts) => {
                     : translation.translations.translatedText;
             }
         } catch (e) {
-            console.error(e);
+            console.error(e.message || e);
         }
         return Promise.resolve(result);
     }
 
     if (opts.priority.indexOf('microsoft_v3') + 1) {
         if (!opts.services['microsoft_v3']) return Promise.resolve(result);
+        if (Array.isArray(opts.services['microsoft_v3'])) {
+            opts.services['microsoft_v3'] = opts
+                .services['microsoft_v3'][Math.floor(Math.random() * opts
+                .services['microsoft_v3'].length)];
+        }
+        result.service = {microsoft_v3: opts.services['microsoft_v3']};
         let url = 'https://api.cognitive.microsofttranslator.com/translate?' +
             querystring.stringify({
                 'api-version': '3.0',
@@ -152,13 +165,19 @@ const translatte = async (text, opts) => {
                     : translation.translations[0].text;
             }
         } catch (e) {
-            console.error(e);
+            console.error(e.message || e);
         }
         return Promise.resolve(result);
     }
 
     if (opts.priority.indexOf('yandex_v1') + 1) {
         if (!opts.services['yandex_v1']) return Promise.resolve(result);
+        if (Array.isArray(opts.services['yandex_v1'])) {
+            opts.services['yandex_v1'] = opts
+                .services['yandex_v1'][Math.floor(Math.random() * opts
+                .services['yandex_v1'].length)];
+        }
+        result.service = {yandex_v1: opts.services['yandex_v1']};
         let url = 'https://translate.yandex.net/api/v1.5/tr.json/translate?' +
             querystring.stringify({
                 key: opts.services['yandex_v1']['key'],
@@ -175,13 +194,19 @@ const translatte = async (text, opts) => {
                     : translation;
             }
         } catch (e) {
-            console.error(e);
+            console.error(e.message || e);
         }
         return Promise.resolve(result);
     }
 
     if (opts.priority.indexOf('yandex_v2') + 1) {
         if (!opts.services['yandex_v2']) return Promise.resolve(result);
+        if (Array.isArray(opts.services['yandex_v2'])) {
+            opts.services['yandex_v2'] = opts
+                .services['yandex_v2'][Math.floor(Math.random() * opts
+                .services['yandex_v2'].length)];
+        }
+        result.service = {yandex_v2: opts.services['yandex_v2']};
         let url = 'https://translate.api.cloud.yandex.net/translate/v2/translate';
         try {
             const {body} = await got(url, {
@@ -204,7 +229,7 @@ const translatte = async (text, opts) => {
                     : translation.text;
             }
         } catch (e) {
-            console.error(e);
+            console.error(e.message || e);
         }
         return Promise.resolve(result);
     }
