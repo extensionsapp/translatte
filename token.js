@@ -70,7 +70,7 @@ var wr = function (a) {
 var config = new Configstore('google-translate-api');
 
 var window = {
-    TKK: config.get('TKK') || '0'
+    TKK: config.get('TKK') || '422854.923862967'
 };
 
 function updateTKK(opts) {

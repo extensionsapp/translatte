@@ -74,9 +74,9 @@ const translatte = async (text, opts) => {
     if (bytes > 5000) {
         let chars = Math.ceil(text.length / Math.ceil(bytes / 4700)) + 100;
         let texts = [];
-        ['\\.\\s', ',\\s', '\\s'].forEach(t => {
+        ['\\.\\s', ',\\s', '\\s', '$'].forEach(t => {
             if (!texts || !texts.length) {
-                texts = text.match(new RegExp('[^]{1,' + chars + '}(' + t + '|$)', 'ig'));
+                texts = text.match(new RegExp('[^]{1,' + chars + '}(' + t + ')', 'ig'));
             }
         });
         if (!texts) return Promise.reject(errors[1]);
