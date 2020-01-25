@@ -73,13 +73,39 @@ const translatte = async (text, opts) => {
 
     if (bytes > 5000) {
         let chars = Math.ceil(text.length / Math.ceil(bytes / 4700)) + 100;
+        let plain = ' ' + text + ' ';
         let texts = [];
-        ['\\.\\s', ',\\s', '\\s', '$'].forEach(t => {
-            if (!texts || !texts.length) {
-                texts = text.match(new RegExp('[^]{1,' + chars + '}(' + t + ')', 'ig'));
+        let j = 0;
+        ['.', ',', ' '].forEach(separator => {
+            if (!plain) return;
+            let split = plain.split(separator);
+            for (let i = 0, l = split.length; i < l; i++) {
+                if (!texts[j]) texts[j] = [];
+                if ((texts[j].join(separator) + split[i]).length < chars) {
+                    texts[j].push(split[i]);
+                    plain = split.slice(i+1).join(separator);
+                } else {
+                    if (!texts[j].length) break;
+                    texts[j].push('');
+                    texts[++j] = [];
+                    if ((texts[j].join(separator) + split[i]).length < chars) {
+                        texts[j].push(split[i]);
+                        plain = split.slice(i+1).join(separator);
+                    } else {
+                        break;
+                    }
+                }
             }
+            texts = texts.map(function (t) {
+                if (!t) return;
+                if (typeof t === 'object') {
+                    return t.join(separator).trim();
+                } else if (typeof t === 'string') {
+                    return t.trim();
+                }
+            }).filter(Boolean);
         });
-        if (!texts) return Promise.reject(errors[1]);
+        if (!texts || !texts.length) return Promise.reject(errors[1]);
         return texts.reduce((p, item) => {
             return p.then(prev => {
                 return new Promise((resolve, reject) => {
@@ -89,7 +115,7 @@ const translatte = async (text, opts) => {
                             t.text = prev && prev.text ? prev.text + ' ' + t.text : t.text;
                             return resolve(t);
                         }).catch(e => reject(e));
-                    }, 500);
+                    }, 1000);
                 });
             });
         }, Promise.resolve());

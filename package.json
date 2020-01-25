@@ -1,6 +1,6 @@
 {
   "name": "translatte",
-  "version": "2.5.5",
+  "version": "2.5.6",
   "description": "A free and unlimited translate for NodeJS",
   "main": "index.js",
   "repository": {
