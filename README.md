@@ -115,6 +115,12 @@ Type: `string` Default: `t`
 
 Query parameter client used in API calls. Can be `t|gtx`.
 
+#### priority
+
+Type: `array` Default: `['google_free']`
+
+Array of priority services.
+
 #### services
 
 Type: `object` Default: `{"google_free": true}`
