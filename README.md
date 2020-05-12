@@ -126,7 +126,7 @@ Objects in order of priority, if one of the services does not perform the transl
   - <a href="https://translate.google.com/" target="_blank">Google Translate</a>, this service works by default. It is completely free and has no limits.
 - `{"google_v3": {"project-id": "XXX", "token": "YYY"}}`
   - <a href="https://cloud.google.com/translate/docs/quickstart-client-libraries-v3" target="_blank">Google Cloud</a>, requires registration and credit card details. 500,000 characters per month are issued free of charge, then $20 for every million characters.
-- `{"microsoft_v3": {"key": "XXX"}}`
+- `{"microsoft_v3": {"key": "XXX", "location": "global"}}`
   - <a href="https://azure.microsoft.com/en-us/pricing/details/cognitive-services/translator-text-api/" target="_blank">Microsoft Azure</a>, requires registration and credit card details. Free of charge 2,000,000 characters per month, then $10 for every million characters.
 - `{"yandex_v1": {"key": "XXX"}}`
   - <a href="https://translate.yandex.ru/developers/keys" target="_blank">Yandex Translate</a>, requires registration. Free of charge 10,000,000 characters per month.

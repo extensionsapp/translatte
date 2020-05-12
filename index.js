@@ -176,6 +176,9 @@ const translatte = async (text, opts) => {
                 method: 'POST',
                 headers: {
                     'Ocp-Apim-Subscription-Key': opts.services['microsoft_v3']['key'],
+                    'Ocp-Apim-Subscription-Region': opts.services['microsoft_v3']['location']
+                        ? opts.services['microsoft_v3']['location'].replace(/[^a-z]/ig, '').toLowerCase()
+                        : 'global',
                     'Content-type': 'application/json'
                 },
                 body: [{text}],
