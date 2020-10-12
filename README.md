@@ -167,6 +167,34 @@ translate('I spea Dutch').then(res => {
 ```
 Otherwise, it will be an empty `string` (`''`).
 
-If you use a proxy and there is a ETIMEDOUT error, then in error you will see the proxy used.
+### Errors an `object`:
 
-2019 ExtensionsApp
+Errors in the name of each `services`.
+
+```json
+{
+  "google_free": "Could not get token from google",
+  "google_v3": "Response code 403 (Forbidden)",
+  "microsoft_v3": "Response code 403 (Forbidden)",
+  "yandex_v1": "Response code 403 (Forbidden)",
+  "yandex_v2": "Response code 403 (Forbidden)"
+}
+```
+
+If the proxy server `LOGIN:PASSWORD@192.0.2.100:12345` is inactive.
+
+```json
+{
+  "google_free": "LOGIN:PASSWORD@192.0.2.100:12345"
+}
+```
+
+If the error is not related to `services`.
+
+```json
+{
+  "message": "The language «foo» is not supported"
+}
+```
+
+**2020 ExtensionsApp**

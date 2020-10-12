@@ -81,7 +81,7 @@ function updateTKK(opts) {
         if (Number(window.TKK.split('.')[0]) === now) {
             resolve();
         } else {
-            got('https://translate.google.' + opts.tld, {...opts.proxy, headers: opts.headers}).then(function (res) {
+            got('https://translate.google.' + opts.tld, {...opts.proxy, headers: opts.headers, timeout: 2000, retry: 0}).then(function (res) {
                 var code = res.body.match(/TKK='.*?';/g);
 
                 if (code) {

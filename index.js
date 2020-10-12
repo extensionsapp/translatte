@@ -1,5 +1,6 @@
 const querystring = require('querystring');
 const languages = require('./languages');
+const proxy_check = require('proxy-check');
 const tunnel = require('tunnel');
 const token = require('./token');
 const got = require('got');
@@ -36,11 +37,11 @@ const translatte = async (text, opts) => {
     ];
 
     if (opts.from && !languages.isSupported(opts.from)) {
-        return Promise.reject(errors[0].replace('[lang]', opts.from));
+        return Promise.reject({message: errors[0].replace('[lang]', opts.from)});
     }
 
     if (opts.to && !languages.isSupported(opts.to)) {
-        return Promise.reject(errors[0].replace('[lang]', opts.to));
+        return Promise.reject({message: errors[0].replace('[lang]', opts.to)});
     }
 
     let bytes = languages.utf8Length(text);
@@ -48,28 +49,44 @@ const translatte = async (text, opts) => {
     opts.tld = opts.tld || 'com';
     opts.from = languages.getCode(opts.from || 'auto');
     opts.to = languages.getCode(opts.to || 'en');
+    opts.services = opts.services || {google_free: true};
+    let services = Object.keys(opts.services);
 
     opts.priority = opts.priority
         ? typeof opts.priority === 'string'
             ? [opts.priority]
-            : opts.priority
-        : opts.services
-            ? Object.keys(opts.services)
-            : ['google_free'];
+            : opts.priority.filter(p => services.indexOf(p) + 1)
+        : services;
 
     if (opts.priority.length > 1) {
-        return opts.priority.reduce((p, priority) => {
+        let all_index = opts.priority.length - 1;
+        let err_services = {};
+        return opts.priority.reduce((p, priority, index) => {
             return p.then(prev => {
-                return new Promise(resolve => {
+                return new Promise((resolve, reject) => {
                     if (prev) return resolve(prev);
                     translatte(text, {...opts, priority}).then(t => {
-                        if (!t || !t.text) return resolve();
+                        if (!t || !t.text) {
+                            err_services[priority] = errors[2];
+                            return all_index === index
+                                ? reject(err_services)
+                                : resolve();
+                        }
                         return resolve(t);
-                    }).catch(() => resolve());
+                    }).catch(e => {
+                        err_services[priority] = typeof e === 'object' && (e[priority] || e.message)
+                            ? e[priority] || e.message
+                            : e;
+                        return all_index === index
+                            ? reject(err_services)
+                            : resolve();
+                    });
                 });
             });
         }, Promise.resolve());
     }
+
+    let priority = opts.priority[0];
 
     if (bytes > 5000) {
         let chars = Math.ceil(text.length / Math.ceil(bytes / 4700)) + 100;
@@ -105,7 +122,7 @@ const translatte = async (text, opts) => {
                 }
             }).filter(Boolean);
         });
-        if (!texts || !texts.length) return Promise.reject(errors[1]);
+        if (!texts || !texts.length) return Promise.reject({[priority]: errors[1]});
         return texts.reduce((p, item) => {
             return p.then(prev => {
                 return new Promise((resolve, reject) => {
@@ -121,8 +138,7 @@ const translatte = async (text, opts) => {
         }, Promise.resolve());
     }
 
-    if (opts.priority.indexOf('google_v3') + 1) {
-        if (!opts.services['google_v3']) return Promise.resolve(result);
+    if (priority === 'google_v3') {
         if (Array.isArray(opts.services['google_v3'])) {
             opts.services['google_v3'] = opts
                 .services['google_v3'][Math.floor(Math.random() * opts
@@ -144,7 +160,8 @@ const translatte = async (text, opts) => {
                     contents: [text]
                 },
                 json: true,
-                timeout: 10000
+                timeout: 10000,
+                retry: 0
             });
             for (const translation of body.translations) {
                 result.text += result.text
@@ -152,12 +169,12 @@ const translatte = async (text, opts) => {
                     : translation.translations.translatedText;
             }
         } catch (e) {
-            console.error(e.message || e);
+            return Promise.reject({google_v3: e.message || e});
         }
         return Promise.resolve(result);
     }
 
-    if (opts.priority.indexOf('microsoft_v3') + 1) {
+    if (priority === 'microsoft_v3') {
         if (!opts.services['microsoft_v3']) return Promise.resolve(result);
         if (Array.isArray(opts.services['microsoft_v3'])) {
             opts.services['microsoft_v3'] = opts
@@ -183,7 +200,8 @@ const translatte = async (text, opts) => {
                 },
                 body: [{text}],
                 json: true,
-                timeout: 10000
+                timeout: 10000,
+                retry: 0
             });
             for (const translation of body) {
                 if (translation.detectedLanguage && translation.detectedLanguage.language) {
@@ -194,12 +212,12 @@ const translatte = async (text, opts) => {
                     : translation.translations[0].text;
             }
         } catch (e) {
-            console.error(e.message || e);
+            return Promise.reject({microsoft_v3: e.message || e});
         }
         return Promise.resolve(result);
     }
 
-    if (opts.priority.indexOf('yandex_v1') + 1) {
+    if (priority === 'yandex_v1') {
         if (!opts.services['yandex_v1']) return Promise.resolve(result);
         if (Array.isArray(opts.services['yandex_v1'])) {
             opts.services['yandex_v1'] = opts
@@ -216,19 +234,19 @@ const translatte = async (text, opts) => {
                 text: text
             });
         try {
-            const {body} = await got(url, {json: true, timeout: 10000});
+            const {body} = await got(url, {json: true, timeout: 10000, retry: 0});
             for (const translation of body.text) {
                 result.text += result.text
                     ? ' ' + translation
                     : translation;
             }
         } catch (e) {
-            console.error(e.message || e);
+            return Promise.reject({yandex_v1: e.message || e});
         }
         return Promise.resolve(result);
     }
 
-    if (opts.priority.indexOf('yandex_v2') + 1) {
+    if (priority === 'yandex_v2') {
         if (!opts.services['yandex_v2']) return Promise.resolve(result);
         if (Array.isArray(opts.services['yandex_v2'])) {
             opts.services['yandex_v2'] = opts
@@ -250,7 +268,8 @@ const translatte = async (text, opts) => {
                     texts: [text]
                 },
                 json: true,
-                timeout: 10000
+                timeout: 10000,
+                retry: 0
             });
             for (const translation of body.translations) {
                 result.text += result.text
@@ -258,7 +277,7 @@ const translatte = async (text, opts) => {
                     : translation.text;
             }
         } catch (e) {
-            console.error(e.message || e);
+            return Promise.reject({yandex_v2: e.message || e});
         }
         return Promise.resolve(result);
     }
@@ -303,71 +322,84 @@ const translatte = async (text, opts) => {
             : {agent: tunnel.httpsOverHttp({proxy})}
         : {};
 
-    let t = await token.get(text, opts);
+    const translate_string = () => {
+        return new Promise(async (resolve, reject) => {
+            let t = await token.get(text, opts);
 
-    if (!t) return Promise.reject(errors[3]);
+            if (!t) return reject({google_free: errors[3]});
 
-    let url = 'https://translate.google.' + opts.tld + '/translate_a/single?' +
-        querystring.stringify({
-            [t.name]: t.value,
-            client: opts.client,
-            sl: opts.from,
-            tl: opts.to,
-            hl: opts.to,
-            dt: ['at', 'bd', 'ex', 'ld', 'md', 'qca', 'rw', 'rm', 'ss', 't'],
-            ie: 'UTF-8',
-            oe: 'UTF-8',
-            otf: 1,
-            ssel: 0,
-            tsel: 0,
-            kc: 7,
-            q: text
+            let url = 'https://translate.google.' + opts.tld + '/translate_a/single?' +
+                querystring.stringify({
+                    [t.name]: t.value,
+                    client: opts.client,
+                    sl: opts.from,
+                    tl: opts.to,
+                    hl: opts.to,
+                    dt: ['at', 'bd', 'ex', 'ld', 'md', 'qca', 'rw', 'rm', 'ss', 't'],
+                    ie: 'UTF-8',
+                    oe: 'UTF-8',
+                    otf: 1,
+                    ssel: 0,
+                    tsel: 0,
+                    kc: 7,
+                    q: text
+                });
+
+            try {
+                translate = await got(url, {...opts.proxy, json: true, timeout: 10000, headers: opts.headers, retry: 0});
+            } catch (e) {
+                return reject({google_free: errors[4]});
+            }
+
+            result.raw = opts.raw
+                ? JSON.stringify(translate.body)
+                : '';
+
+            let body = translate.body;
+
+            body[0].forEach(obj => {
+                if (obj[0]) {
+                    result.text += obj[0];
+                }
+            });
+
+            if (body[2] === body[8][0][0]) {
+                result.from.language.iso = body[2];
+            } else {
+                result.from.language.didYouMean = true;
+                result.from.language.iso = body[8][0][0];
+            }
+
+            if (body[7] && body[7][0]) {
+                let str = body[7][0];
+
+                str = str.replace(/<b><i>/g, '[');
+                str = str.replace(/<\/i><\/b>/g, ']');
+
+                result.from.text.value = str;
+
+                if (body[7][5] === true) {
+                    result.from.text.autoCorrected = true;
+                } else {
+                    result.from.text.didYouMean = true;
+                }
+            }
+
+            return result.text
+                ? resolve(result)
+                : reject({google_free: errors[2]});
         });
+    };
 
-    try {
-        translate = await got(url, {...opts.proxy, json: true, timeout: 10000, headers: opts.headers});
-    } catch (e) {
-        if (e && e.code && e.code === 'ETIMEDOUT' && result.proxy) {
-            return Promise.reject(result.proxy);
-        }
-        return Promise.reject(errors[4]);
-    }
-
-    result.raw = opts.raw
-        ? JSON.stringify(translate.body)
-        : '';
-
-    let body = translate.body;
-
-    body[0].forEach(obj => {
-        if (obj[0]) {
-            result.text += obj[0];
-        }
-    });
-
-    if (body[2] === body[8][0][0]) {
-        result.from.language.iso = body[2];
+    if (opts && opts.proxy && opts.proxy.agent) {
+        return proxy_check(result.proxy).then(() => {
+            return translate_string();
+        }).catch(() => {
+            return Promise.reject({google_free: result.proxy});
+        });
     } else {
-        result.from.language.didYouMean = true;
-        result.from.language.iso = body[8][0][0];
+        return translate_string();
     }
-
-    if (body[7] && body[7][0]) {
-        let str = body[7][0];
-
-        str = str.replace(/<b><i>/g, '[');
-        str = str.replace(/<\/i><\/b>/g, ']');
-
-        result.from.text.value = str;
-
-        if (body[7][5] === true) {
-            result.from.text.autoCorrected = true;
-        } else {
-            result.from.text.didYouMean = true;
-        }
-    }
-
-    return Promise.resolve(result);
 };
 
 module.exports = translatte;

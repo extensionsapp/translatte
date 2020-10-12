@@ -1,6 +1,6 @@
 {
   "name": "translatte",
-  "version": "2.5.8",
+  "version": "3.0.0",
   "description": "A free and unlimited translate for NodeJS",
   "main": "index.js",
   "repository": {
@@ -41,6 +41,7 @@
   "dependencies": {
     "tunnel": "0.0.6",
     "configstore": "4.0.0",
+    "proxy-check": "1.0.7",
     "got": "9.6.0"
   }
 }
